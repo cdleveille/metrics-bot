@@ -1,0 +1,23 @@
+version: "3.6"
+
+services:
+  # mongo service
+  metrics-bot-mongodb-local:
+    image: mongo:latest
+    container_name: metrics-bot-mongodb-local
+    command: mongod --port 27017
+    ports:
+      - 27017:27017
+    expose:
+      - 27017
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - mongo_net
+
+volumes:
+  mongo-data:
+
+networks:
+  mongo_net:
+    driver: bridge
