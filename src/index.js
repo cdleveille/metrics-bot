@@ -1,7 +1,7 @@
 import { ChannelType, Client, Events, GatewayIntentBits } from "discord.js";
 
 import { commandsLookup } from "./commands";
-import { Config, connectToDatabase, log, registerSlashCommands } from "./helpers";
+import { Config, connectToDatabase, isModerator, log, registerSlashCommands } from "./helpers";
 import { Message, Reaction } from "./models";
 
 const client = new Client({
@@ -50,7 +50,8 @@ client.on(Events.MessageCreate, async message => {
 			channel_name: message.channel.name,
 			message_id: message.id,
 			user_id: message.author.id,
-			user_name: message.author.username
+			user_name: message.author.username,
+			is_moderator: isModerator(message.member)
 		});
 	} catch (error) {
 		log.error(error);
@@ -68,6 +69,7 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
 			message_id: reaction.message.id,
 			user_id: user.id,
 			user_name: user.username,
+			is_moderator: isModerator(reaction.message.member),
 			user_reacted_to_id: reaction.message.author.id,
 			user_reacted_to_name: reaction.message.author.username,
 			emoji: reaction.emoji.name,

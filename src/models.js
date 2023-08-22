@@ -40,6 +40,10 @@ const messageSchemaDefs = {
 	user_name: {
 		type: String,
 		required: true
+	},
+	is_moderator: {
+		type: Boolean,
+		required: true
 	}
 };
 

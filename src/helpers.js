@@ -24,10 +24,6 @@ export const log = {
 
 export const DiscordApi = new REST({ version: "10" }).setToken(Config.BOT_TOKEN);
 
-export const CommandNames = {
-	Report: "report"
-};
-
 export const connectToDatabase = async () => {
 	try {
 		log.info(`Connecting to database on ${Config.MONGO_URI}...`);
@@ -47,3 +43,12 @@ export const registerSlashCommands = async client => {
 		throw `Error registering slash commands: ${error}`;
 	}
 };
+
+export const CommandNames = {
+	Report: "report"
+};
+
+export const ModeratorRoleNames = ["Moderator"];
+
+export const isModerator = member =>
+	member.roles.cache.some(role => ModeratorRoleNames.includes(role.name));
