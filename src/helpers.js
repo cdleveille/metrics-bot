@@ -28,7 +28,7 @@ export const connectToDatabase = async () => {
 	try {
 		log.info(`Connecting to database on ${Config.MONGO_URI}...`);
 		await mongoose.connect(Config.MONGO_URI);
-		log.info(`Connected to database: ${Config.MONGO_URI}`);
+		log.info("Connected to database.");
 	} catch (error) {
 		log.error(`Error connecting to database: ${error}`);
 	}
@@ -52,3 +52,7 @@ export const ModeratorRoleNames = ["Moderator"];
 
 export const isModerator = member =>
 	member.roles.cache.some(role => ModeratorRoleNames.includes(role.name));
+
+export const sortObjectKeysByValue = (obj, asc) => {
+	return Object.keys(obj).sort((a, b) => (asc ? obj[a] - obj[b] : obj[b] - obj[a]));
+};
