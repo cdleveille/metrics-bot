@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { REST, Routes } from "discord.js";
+import { EmbedBuilder, REST, Routes } from "discord.js";
 import mongoose from "mongoose";
 
 import { commands } from "./commands";
@@ -56,3 +56,18 @@ export const isModerator = member =>
 export const sortObjectKeysByValue = (obj, asc) => {
 	return Object.keys(obj).sort((a, b) => (asc ? obj[a] - obj[b] : obj[b] - obj[a]));
 };
+
+export class Embed {
+	static success = ({ title, description }) => {
+		const embed = new EmbedBuilder().setColor("#00e64d");
+		title && embed.setTitle(title);
+		description && embed.setDescription(description);
+		return embed;
+	};
+	static error = ({ title, description }) => {
+		const embed = new EmbedBuilder().setColor("#ff6666");
+		embed.setTitle(title || "Error");
+		description && embed.setDescription(description);
+		return embed;
+	};
+}

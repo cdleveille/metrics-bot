@@ -1,7 +1,14 @@
 import { ChannelType, Client, Events, GatewayIntentBits } from "discord.js";
 
 import { commandsLookup } from "./commands";
-import { Config, connectToDatabase, isModerator, log, registerSlashCommands } from "./helpers";
+import {
+	Config,
+	connectToDatabase,
+	Embed,
+	isModerator,
+	log,
+	registerSlashCommands
+} from "./helpers";
 import { Message, Reaction } from "./models";
 
 const client = new Client({
@@ -35,9 +42,9 @@ client.on(Events.InteractionCreate, async interaction => {
 	} catch (error) {
 		log.error(error);
 		if (!interaction.isRepliable()) return;
-		if (interaction.deferred || interaction.replied)
-			await interaction.editReply(`Error: ${error}`);
-		else await interaction.reply(`Error: ${error}`);
+		const embed = { embeds: [Embed.error({ description: error })] };
+		if (interaction.deferred || interaction.replied) await interaction.editReply(embed);
+		else await interaction.reply(embed);
 	}
 });
 
@@ -60,7 +67,7 @@ client.on(Events.MessageCreate, async message => {
 		});
 	} catch (error) {
 		log.error(error);
-		await message.channel.send(`Error: ${error}`);
+		if (!Config.IS_PROD) await message.channel.send({ embeds: [Embed.error(error)] });
 	}
 });
 
@@ -82,7 +89,7 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
 		});
 	} catch (error) {
 		log.error(error);
-		await reaction.message.channel.send(`Error: ${error}`);
+		if (!Config.IS_PROD) await reaction.message.channel.send({ embeds: [Embed.error(error)] });
 	}
 });
 

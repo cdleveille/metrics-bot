@@ -1,17 +1,23 @@
-import { CommandNames, isModerator, sortObjectKeysByValue } from "./helpers";
+import { CommandNames, Embed, isModerator, sortObjectKeysByValue } from "./helpers";
 import { Message, Reaction } from "./models";
 
 export const reportCommand = {
 	name: CommandNames.Report,
-	description: "Show a report detailing the metrics collected for this server",
+	description: "Show a report detailing the moderator activity in the server.",
 	handler: async interaction => {
 		await interaction.deferReply();
 
-		if (!isModerator(interaction.member)) throw "You must be a moderator to use this command";
+		if (!isModerator(interaction.member)) {
+			return await interaction.editReply({
+				embeds: [
+					Embed.error({ description: "You must be a moderator to use this command!" })
+				]
+			});
+		}
 
 		const { id: server_id, name: server_name } = interaction.guild;
 
-		let output = `Moderator Activity in ${server_name}:\n`;
+		const title = `Moderator Activity in ${server_name}:\n`;
 
 		const [messages, reactions] = await Promise.all([
 			Message.find({ server_id }),
@@ -21,16 +27,16 @@ export const reportCommand = {
 		const thirtyDaysAgo = new Date(Date.now() - 1000 * 60 * 60 * 24 * 30);
 
 		const messageCountByModerator = messages.reduce(
-			(acc, message) => {
-				if (!message.is_moderator) return acc;
+			(acc, { user_id, is_moderator, created_at }) => {
+				if (!is_moderator) return acc;
 
-				if (message.created_at > thirtyDaysAgo) {
-					if (!acc.last30[message.user_id]) acc.last30[message.user_id] = 0;
-					acc.last30[message.user_id]++;
+				if (created_at > thirtyDaysAgo) {
+					if (!acc.last30[user_id]) acc.last30[user_id] = 0;
+					acc.last30[user_id]++;
 				}
 
-				if (!acc.allTime[message.user_id]) acc.allTime[message.user_id] = 0;
-				acc.allTime[message.user_id]++;
+				if (!acc.allTime[user_id]) acc.allTime[user_id] = 0;
+				acc.allTime[user_id]++;
 
 				return acc;
 			},
@@ -45,27 +51,27 @@ export const reportCommand = {
 			messageCountByModerator.allTime
 		);
 
-		output += "\nMessages (Last 30 Days):\n";
+		let description = "\nMessages (Last 30 Days):\n";
 		for (const user_id of messageCountByModeratorLast30KeysSortedDesc) {
-			output += `<@${user_id}>: ${messageCountByModerator.last30[user_id]}\n`;
+			description += `<@${user_id}>: ${messageCountByModerator.last30[user_id]}\n`;
 		}
 
-		output += "\nMessages (All Time):\n";
+		description += "\nMessages (All Time):\n";
 		for (const user_id of messageCountByModeratorAllTimeKeysSortedDesc) {
-			output += `<@${user_id}>: ${messageCountByModerator.allTime[user_id]}\n`;
+			description += `<@${user_id}>: ${messageCountByModerator.allTime[user_id]}\n`;
 		}
 
 		const reactionCountByModerator = reactions.reduce(
-			(acc, reaction) => {
-				if (!reaction.is_moderator) return acc;
+			(acc, { user_id, is_moderator, created_at }) => {
+				if (!is_moderator) return acc;
 
-				if (reaction.created_at > thirtyDaysAgo) {
-					if (!acc.last30[reaction.user_id]) acc.last30[reaction.user_id] = 0;
-					acc.last30[reaction.user_id]++;
+				if (created_at > thirtyDaysAgo) {
+					if (!acc.last30[user_id]) acc.last30[user_id] = 0;
+					acc.last30[user_id]++;
 				}
 
-				if (!acc.allTime[reaction.user_id]) acc.allTime[reaction.user_id] = 0;
-				acc.allTime[reaction.user_id]++;
+				if (!acc.allTime[user_id]) acc.allTime[user_id] = 0;
+				acc.allTime[user_id]++;
 
 				return acc;
 			},
@@ -80,17 +86,17 @@ export const reportCommand = {
 			reactionCountByModerator.allTime
 		);
 
-		output += "\nReactions (Last 30 Days):\n";
+		description += "\nReactions (Last 30 Days):\n";
 		for (const user_id of reactionCountByModeratorLast30KeysSortedDesc) {
-			output += `<@${user_id}>: ${reactionCountByModerator.last30[user_id]}\n`;
+			description += `<@${user_id}>: ${reactionCountByModerator.last30[user_id]}\n`;
 		}
 
-		output += "\nReactions (All Time):\n";
+		description += "\nReactions (All Time):\n";
 		for (const user_id of reactionCountByModeratorAllTimeKeysSortedDesc) {
-			output += `<@${user_id}>: ${reactionCountByModerator.allTime[user_id]}\n`;
+			description += `<@${user_id}>: ${reactionCountByModerator.allTime[user_id]}\n`;
 		}
 
-		await interaction.editReply(output);
+		await interaction.editReply({ embeds: [Embed.success({ title, description })] });
 	}
 };
 
