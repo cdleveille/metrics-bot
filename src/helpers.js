@@ -48,10 +48,10 @@ export const CommandNames = {
 	Report: "report"
 };
 
-export const ModeratorRoleNames = ["Moderator"];
+export const ModeratorRoleIDs = ["1143560919465611334", "910043404707176448"];
 
 export const isModerator = member =>
-	member.roles.cache.some(role => ModeratorRoleNames.includes(role.name));
+	member.roles.cache.some(role => ModeratorRoleIDs.includes(role.id));
 
 export const sortObjectKeysByValue = (obj, asc) => {
 	return Object.keys(obj).sort((a, b) => (asc ? obj[a] - obj[b] : obj[b] - obj[a]));
