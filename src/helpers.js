@@ -50,8 +50,8 @@ export const CommandNames = {
 
 export const ModeratorRoleIDs = [
 	"1143560919465611334", // bit buster mod
-	"910043404707176448", //kolony admin
-	"1072803992712785940" //kolony mod
+	"910043404707176448", // kolony admin
+	"1072803992712785940" // kolony mod
 ];
 
 export const isModerator = member =>

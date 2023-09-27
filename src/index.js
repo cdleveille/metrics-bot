@@ -11,6 +11,8 @@ import {
 } from "./helpers";
 import { Message, Reaction } from "./models";
 
+const testChannelIdentifier = "_test";
+
 const client = new Client({
 	intents: [
 		GatewayIntentBits.Guilds,
@@ -33,8 +35,8 @@ client.once(Events.ClientReady, async () => {
 
 client.on(Events.InteractionCreate, async interaction => {
 	try {
-		if (interaction.channel.name.includes("test") && Config.IS_PROD) return;
-		if (!interaction.channel.name.includes("test") && !Config.IS_PROD) return;
+		if (interaction.channel.name.includes(testChannelIdentifier) && Config.IS_PROD) return;
+		if (!interaction.channel.name.includes(testChannelIdentifier) && !Config.IS_PROD) return;
 		if (!interaction.isChatInputCommand()) return;
 		const command = commandsLookup[interaction.commandName];
 		if (command) return await command.handler(interaction);
@@ -52,8 +54,12 @@ client.on(Events.MessageCreate, async message => {
 	try {
 		if (message.channel.type === ChannelType.DM) return;
 		if (message.author.bot) return;
-		if (message.channel.name?.includes("test") && Config.IS_PROD) return;
-		if (message.channel.name && !message.channel.name?.includes("test") && !Config.IS_PROD)
+		if (message.channel.name?.includes(testChannelIdentifier) && Config.IS_PROD) return;
+		if (
+			message.channel.name &&
+			!message.channel.name?.includes(testChannelIdentifier) &&
+			!Config.IS_PROD
+		)
 			return;
 		await Message.create({
 			server_id: message.guild.id,
