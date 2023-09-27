@@ -48,7 +48,11 @@ export const CommandNames = {
 	Report: "report"
 };
 
-export const ModeratorRoleIDs = ["1143560919465611334", "910043404707176448"];
+export const ModeratorRoleIDs = [
+	"1143560919465611334", // bit buster mod
+	"910043404707176448", //kolony admin
+	"1072803992712785940" //kolony mod
+];
 
 export const isModerator = member =>
 	member.roles.cache.some(role => ModeratorRoleIDs.includes(role.id));
